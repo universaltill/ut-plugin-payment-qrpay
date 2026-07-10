@@ -1,7 +1,7 @@
 {
   "id": "com.universaltill.payment-qrpay",
   "name": "QR Pay",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "QR-code tender method with an in-process WASM handler: settling a sale via QR Pay runs the plugin, which emits the payment QR content.",
   "author": "Universal Till",
   "website": "https://universaltill.com",
@@ -25,5 +25,11 @@
       "trigger_event": "payment.qrpay.requested"
     }
   ],
-  "entrypoint": "./bin/plugin.wasm"
+  "entrypoint": "./bin/plugin.wasm",
+  "hooks": [
+    {
+      "event": "payment.qrpay.requested",
+      "action": "qrpay.settle"
+    }
+  ]
 }
