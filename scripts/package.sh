@@ -14,7 +14,7 @@ VERSION=$(python3 -c "import json;print(json.load(open('manifest.json'))['versio
 OUT="dist/${ID}_${VERSION}_universal.tar.gz"
 mkdir -p dist
 
-entries=(manifest.json assets README.md)
+entries=(manifest.json assets README.md bin)
 [ -f LICENSE ] && entries+=(LICENSE)
 tar -czf "$OUT" "${entries[@]}"
 if command -v sha256sum >/dev/null 2>&1; then sha256sum "$OUT" > "${OUT}.sha256"; else shasum -a 256 "$OUT" > "${OUT}.sha256"; fi

@@ -1,16 +1,17 @@
 {
   "id": "com.universaltill.payment-qrpay",
   "name": "QR Pay",
-  "version": "1.0.0",
-  "description": "Adds a QR-code tender method to the till. Completing a sale with QR Pay publishes payment.qrpay.requested for the payment handler.",
+  "version": "1.1.0",
+  "description": "QR-code tender method with an in-process WASM handler: settling a sale via QR Pay runs the plugin, which emits the payment QR content.",
   "author": "Universal Till",
   "website": "https://universaltill.com",
   "canonical_type": "payment",
-  "runtime": "none",
+  "runtime": "wasm",
   "device_arch": "any",
   "min_pos_version": "1.0.0",
   "permissions": [
-    "pos.tender"
+    "pos.tender",
+    "events:receive"
   ],
   "locales": [
     "en-US"
@@ -23,5 +24,6 @@
       "sort_order": 1,
       "trigger_event": "payment.qrpay.requested"
     }
-  ]
+  ],
+  "entrypoint": "./bin/plugin.wasm"
 }

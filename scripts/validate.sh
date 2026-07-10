@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 - <<'PY'
-import json, re, sys
+import json, os, re, sys
 m = json.load(open("manifest.json"))
 errs = []
 if not re.match(r'^[a-z0-9]+([.-][a-z0-9]+)*$', m.get("id","")): errs.append("bad id")
@@ -13,7 +13,11 @@ if not m.get("name"): errs.append("missing name")
 if not re.match(r'^\d+\.\d+\.\d+', m.get("version","")): errs.append("bad version")
 if not m.get("permissions"): errs.append("missing permissions")
 if not m.get("locales"): errs.append("missing locales")
-if m.get("runtime") != "none": errs.append("runtime must be 'none' until the wasm handler lands (ADR-0001)")
+if m.get("runtime") not in ("none", "wasm"): errs.append("runtime must be 'none' or 'wasm' (ADR-0001)")
+if m.get("runtime") == "wasm":
+    ep = (m.get("entrypoint") or "").lstrip("./")
+    if not ep.endswith(".wasm"): errs.append("wasm runtime needs a .wasm entrypoint")
+    elif not os.path.isfile(ep): errs.append(f"module not found: {ep} (run scripts/build.sh)")
 if m.get("device_arch") != "any": errs.append("device_arch must be 'any'")
 if m.get("canonical_type") != "payment": errs.append("canonical_type must be 'payment'")
 pays = [e for e in m.get("entries", []) if e.get("type") == "payment"]
