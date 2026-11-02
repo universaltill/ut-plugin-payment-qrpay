@@ -16,13 +16,12 @@
 # WHAT COUNTS AS "SHIPPED" -- THE COMPILED-PLUGIN VARIANT: this repo builds a
 # WASI module (scripts/build.sh: `go build -o bin/plugin.wasm ./src`) and
 # package.sh's entries=(...) line bundles that compiled `bin` directory.
-# Unlike most compiled plugins, this repo COMMITS bin/plugin.wasm (it is not
-# gitignored). release.yml rebuilds bin/ from source before packaging, so the
-# committed binary never ships itself; `bin/*` is listed anyway so a changed
-# committed binary asks for a bump (a harmless over-approximation). So SHIPPED_PATTERNS also
-# covers the SOURCE that PRODUCES bin/plugin.wasm: every file under src/ (the
-# `go build ... ./src` argument), go.mod/go.sum (a dependency bump changes
-# the compiled binary without touching anything under src/), and
+# `bin/` is gitignored, so it can NEVER appear in `git diff --name-only` no
+# matter how much the plugin's behaviour changed; keying SHIPPED_PATTERNS off
+# the literal bundled path would silently never fire. So SHIPPED_PATTERNS
+# also covers the SOURCE that PRODUCES bin/plugin.wasm: every file under src/
+# (the `go build ... ./src` argument), go.mod/go.sum (a dependency bump
+# changes the compiled binary without touching anything under src/), and
 # scripts/build.sh itself -- the BUILD RECIPE, so a new
 # -ldflags/-trimpath/-tags or a different GOOS/GOARCH changes the shipped
 # binary while every file under src/ stays byte-identical.
@@ -53,7 +52,6 @@ SHIPPED_PATTERNS=(
     'manifest.json'
     'assets/*'
     'README.md'
-    'bin/*'
     'LICENSE'
     'src/*'
     'go.mod'

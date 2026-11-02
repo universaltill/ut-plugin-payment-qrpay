@@ -12,10 +12,9 @@
 # check. Nothing here writes into the real tree.
 #
 # This fixture mirrors the COMPILED-plugin shape (WASI module built from src/
-# via go build). bin/plugin.wasm is COMMITTED in this repo (not gitignored), so it
-# is itself a shipped path; the guard also keys off the source that produces it
-# (src/, go.mod, go.sum, scripts/build.sh), because a source change must bump
-# even if the committed binary was not rebuilt.
+# via go build). bin/ is gitignored, so it can never appear in `git diff --name-only`;
+# the guard keys off the source that produces it (src/, go.mod, go.sum and
+# scripts/build.sh) instead.
 # See check-version-bump.sh's own header.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -105,8 +104,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 GOOS=wasip1 GOARCH=wasm go build -o bin/plugin.wasm ./src
 BUILD
-    mkdir -p "${case_dir}/bin"
-    echo "wasm-v1" >"${case_dir}/bin/plugin.wasm"
+    printf '/bin/\n/dist/\n' >"${case_dir}/.gitignore"
 
     (
         cd "$case_dir"
@@ -438,14 +436,6 @@ base_sha=$(cd "$case_dir" && git rev-parse HEAD)
 (cd "$case_dir" && git mv src/sub/sub.go docs/sub.go)
 commit_change
 assert_fail_containing "source file renamed out of src/, no bump" "src/sub/sub.go" "FAIL"
-
-# --- case 12b: the committed bin/plugin.wasm changed, no bump -> FAIL ------
-# This repo TRACKS bin/plugin.wasm (not gitignored), so a rebuilt binary is
-# itself a shipped-file diff.
-fresh_repo
-echo "wasm-v2" >"${case_dir}/bin/plugin.wasm"
-commit_change
-assert_fail_containing "tracked bin/plugin.wasm changed, no bump" "bin/plugin.wasm" "FAIL"
 
 # --- case 20 (ut-docs#4484): first PR of a new repo, no manifest.json at the
 # merge-base -> PASS. A new plugin repo starts with a commit that holds no
