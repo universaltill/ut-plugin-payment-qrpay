@@ -12,5 +12,5 @@ event is audited so back-office reconciliation can pick it up.
 ## Release
 Tag `v<version>` → CI validates the manifest, packages a universal
 `tar.gz`, publishes to the marketplace and (dev) auto-approves.
-Secrets: `MARKETPLACE_UPLOAD_TOKEN`; variable: `MARKETPLACE_BASE_URL`.
+Secrets: `MARKETPLACE_BASE_URL`, `MARKETPLACE_UPLOAD_TOKEN`.
 Vars: `AUTO_APPROVE`, `MARKETPLACE_LISTING_ID` (set after first publish).
